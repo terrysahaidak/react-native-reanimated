@@ -18,7 +18,7 @@ extern "C" {
 
 class ReanimatedJSI : public jsi::HostObject {
 private:
-  // jclass _moduleClass;
+  jclass _moduleClass;
   jobject _moduleObject;
   jmethodID _createNode;
   jmethodID _dropNode;
@@ -32,7 +32,7 @@ private:
 
 public:
   ReanimatedJSI(
-    // jclass moduleClass,
+    jclass moduleClass,
     jobject moduleObject,
     jmethodID createNode,
     jmethodID dropNode,

@@ -30,7 +30,7 @@ void JNICALL Java_com_swmansion_reanimated_ReanimatedModule_installJSI(
   auto getValue = env->GetMethodID(clazz, "getValue", "(ILcom/swmansion/reanimated/Callback;)V");
 
   auto module = std::make_shared<ReanimatedJSI>(
-    // clazz,
+    clazz,
     thiz,
     createNode,
     dropNode,
@@ -78,9 +78,8 @@ inline local_ref<ReadableArray::javaobject> castReadableArray(
   return make_local(reinterpret_cast<ReadableArray::javaobject>(nativeArray.get()));
 }
 
-jintArray createJIntArray(JNIEnv *env, jsi::Runtime &runtime, jsi::Value arg) {
-    auto arr = arg.getObject(runtime).asArray(runtime).getArray(runtime);
-    // __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "Number is %f", number);
+jintArray createJIntArray(JNIEnv *env, jsi::Runtime &runtime, const jsi::Value arg) {
+    auto arr = arg.getObject(runtime).asArray(runtime);
 
     auto arrayLength = arr.length(runtime);
 
@@ -98,7 +97,7 @@ jintArray createJIntArray(JNIEnv *env, jsi::Runtime &runtime, jsi::Value arg) {
 }
 
 ReanimatedJSI::ReanimatedJSI(
-  // jclass moduleClass,
+  jclass moduleClass,
   jobject moduleObject,
   jmethodID createNode,
   jmethodID dropNode,
@@ -110,7 +109,7 @@ ReanimatedJSI::ReanimatedJSI(
   jmethodID detachEvent,
   jmethodID getValue
 ): 
-  // _moduleClass(moduleClass),
+  _moduleClass(moduleClass),
   _moduleObject(moduleObject),
   _createNode(createNode),
   _dropNode(dropNode),
@@ -198,8 +197,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createNodeOperator") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -208,8 +208,8 @@ jsi::Value ReanimatedJSI::get(
       auto env = Environment::current();
   
       auto nodeId = (jint)arguments[0].asNumber();
-      auto op = make_jstring(arguments[1].asString(runtime).utf8(runtime));
-      auto arr = createJIntArray(env, runtime, &arguments[2]);
+      auto op = (jstring)make_jstring(arguments[1].asString(runtime).utf8(runtime));
+      jintArray arr = createJIntArray(env, runtime, &arguments[2]);
 
       auto method = env->GetMethodID(clazz, "createNodeOperator", "(ILjava/lang/String;[I)V");
       env->CallVoidMethod(moduleObject, method, nodeId, op, arr);
@@ -222,8 +222,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createDebugNode") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -246,8 +247,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createNodeCallFunc") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -258,8 +260,8 @@ jsi::Value ReanimatedJSI::get(
       auto nodeId = (jint)arguments[0].asNumber();
       auto what = (jint)arguments[1].asNumber();
 
-      auto args = createJIntArray(env, runtime, &arguments[2]);
-      auto params = createJIntArray(env, runtime, &arguments[3]);
+      jintArray args = createJIntArray(env, runtime, &arguments[2]);
+      jintArray params = createJIntArray(env, runtime, &arguments[3]);
 
       auto method = env->GetMethodID(clazz, "createNodeCallFunc", "(II[I[I)V");
       env->CallVoidMethod(moduleObject, method, nodeId, what, args, params);
@@ -272,8 +274,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createBezierNode") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -299,8 +302,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createJSCallNode") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -309,7 +313,7 @@ jsi::Value ReanimatedJSI::get(
       auto env = Environment::current();
   
       auto nodeId = (jint)arguments[0].asNumber();
-      auto input = createJIntArray(env, runtime, &arguments[1]);
+      jintArray input = createJIntArray(env, runtime, &arguments[1]);
 
       auto method = env->GetMethodID(clazz, "createJSCallNode", "(I[I)V");
       env->CallVoidMethod(moduleObject, method, nodeId, input);
@@ -322,8 +326,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createNodeFunction") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -345,8 +350,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createNodeParam") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -367,8 +373,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createClockNode") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -389,8 +396,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createClockStartNode") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -412,8 +420,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createClockStopNode") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -435,8 +444,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createClockTestNode") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -458,8 +468,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createNodeConcat") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -468,7 +479,7 @@ jsi::Value ReanimatedJSI::get(
       auto env = Environment::current();
   
       auto nodeId = (jint)arguments[0].asNumber();
-      auto input = createJIntArray(env, runtime, &arguments[1]);
+      jintArray input = createJIntArray(env, runtime, &arguments[1]);
 
       auto method = env->GetMethodID(clazz, "createNodeConcat", "(I[I)V");
       env->CallVoidMethod(moduleObject, method, nodeId, input);
@@ -481,8 +492,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createNodeAlways") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -504,8 +516,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createCondNode") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -528,8 +541,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createSetNode") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -552,8 +566,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "createBlockNode") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -562,7 +577,7 @@ jsi::Value ReanimatedJSI::get(
       auto env = Environment::current();
   
       auto nodeId = (jint)arguments[0].asNumber();
-      auto block = createJIntArray(env, runtime, &arguments[1]);
+      jintArray block = createJIntArray(env, runtime, &arguments[1]);
 
       auto method = env->GetMethodID(clazz, "createBlockNode", "(I[I)V");
       env->CallVoidMethod(moduleObject, method, nodeId, block);
@@ -719,8 +734,9 @@ jsi::Value ReanimatedJSI::get(
 
   if (methodName == "configureProps") {
     auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
 
-    auto callback = [moduleObject](
+    auto callback = [clazz, moduleObject](
       jsi::Runtime &runtime,
       const jsi::Value &thisValue,
       const jsi::Value *arguments,
@@ -730,12 +746,12 @@ jsi::Value ReanimatedJSI::get(
 
       auto dynamicArray1 = jsi::dynamicFromValue(runtime, arguments[0]);
       local_ref<ReadableArray::javaobject> nativePropsArray =
-        castReadableMap(ReadableNativeArray::newObjectCxxArgs(dynamicArray1));
+        castReadableArray(ReadableNativeArray::newObjectCxxArgs(dynamicArray1));
       auto dynamicArray2 = jsi::dynamicFromValue(runtime, arguments[0]);
       local_ref<ReadableArray::javaobject> uiPropsArray =
-        castReadableMap(ReadableNativeArray::newObjectCxxArgs(dynamicArray2));
+        castReadableArray(ReadableNativeArray::newObjectCxxArgs(dynamicArray2));
 
-      auto method = env->GetMethodID(clazz, "configureProps", "(Lcom/facebook/react/bridge/ReadableArray;Lcom/facebook/react/bridge/ReadableArray;)V")
+      auto method = env->GetMethodID(clazz, "configureProps", "(Lcom/facebook/react/bridge/ReadableArray;Lcom/facebook/react/bridge/ReadableArray;)V");
 
       env->CallVoidMethod(moduleObject, method, nativePropsArray.get(), uiPropsArray.get());
 
