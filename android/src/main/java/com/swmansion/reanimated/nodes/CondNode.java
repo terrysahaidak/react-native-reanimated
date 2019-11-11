@@ -2,6 +2,7 @@ package com.swmansion.reanimated.nodes;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.swmansion.reanimated.NodesManager;
+import javax.annotation.Nullable;
 
 public class CondNode extends Node {
 
@@ -10,11 +11,12 @@ public class CondNode extends Node {
   public CondNode(
           int nodeID,
           final int cond,
-          final int ifBlock,
-          final int elseBlock,
+          @Nullable final Integer ifBlock,
+          @Nullable final Integer elseBlock,
           NodesManager nodesManager) {
     super(nodeID, null, nodesManager);
     mCondID = cond;
+
     mIfBlockID = ifBlock != null ? ifBlock : -1;
     mElseBlockID = elseBlock != null ? elseBlock : -1;
   }

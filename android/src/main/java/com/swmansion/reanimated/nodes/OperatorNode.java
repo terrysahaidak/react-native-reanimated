@@ -224,6 +224,7 @@ public class OperatorNode extends Node {
   public OperatorNode(int nodeID, String op, int[] input, NodesManager nodesManager) {
     super(nodeID, null, nodesManager);
     mInputNodes = new Node[input.length];
+    mInputIDs = input;
 
     if ("add".equals(op)) {
       mOperator = ADD;
