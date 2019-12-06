@@ -78,7 +78,7 @@ inline local_ref<ReadableArray::javaobject> castReadableArray(
   return make_local(reinterpret_cast<ReadableArray::javaobject>(nativeArray.get()));
 }
 
-jintArray createJIntArray(JNIEnv *env, jsi::Runtime &runtime, const jsi::Value &arg) {
+local_ref<jintArray> createJIntArray(JNIEnv *env, jsi::Runtime &runtime, const jsi::Value &arg) {
     auto arr = arg.getObject(runtime).asArray(runtime);
 
     auto arrayLength = arr.length(runtime);
@@ -158,7 +158,7 @@ jsi::Value ReanimatedJSI::get(
 
       jclass callbackClass = env->FindClass("com/swmansion/reanimated/Callback");
       jmethodID callbackConstructor = env->GetMethodID(callbackClass, "<init>", "(JJ)V");
-      jobject callback = env->NewObject(callbackClass, callbackConstructor, runtimePtr, fnPtr);
+      local_ref<jobject> callback = env->NewObject(callbackClass, callbackConstructor, runtimePtr, fnPtr);
 
       // this line throws "JNI DETECTED ERROR IN APPLICATION: use of invalid jobject 0x7ff25f9e14"
       env->CallVoidMethod(moduleObject, method, nodeId, callback);
@@ -209,7 +209,7 @@ jsi::Value ReanimatedJSI::get(
   
       auto nodeId = (jint)arguments[0].asNumber();
       auto op = (jstring)env->NewStringUTF(arguments[1].asString(runtime).utf8(runtime).c_str());
-      jintArray arr = createJIntArray(env, runtime, std::move(arguments[2]));
+      local_ref<jintArray> arr = createJIntArray(env, runtime, std::move(arguments[2]));
 
       auto method = env->GetMethodID(clazz, "createNodeOperator", "(ILjava/lang/String;[I)V");
       env->CallVoidMethod(moduleObject, method, nodeId, op, arr);
@@ -260,8 +260,8 @@ jsi::Value ReanimatedJSI::get(
       auto nodeId = (jint)arguments[0].asNumber();
       auto what = (jint)arguments[1].asNumber();
 
-      jintArray args = createJIntArray(env, runtime, std::move(arguments[2]));
-      jintArray params = createJIntArray(env, runtime, std::move(arguments[3]));
+      auto args = createJIntArray(env, runtime, std::move(arguments[2]));
+      auto params = createJIntArray(env, runtime, std::move(arguments[3]));
 
       auto method = env->GetMethodID(clazz, "createNodeCallFunc", "(II[I[I)V");
       env->CallVoidMethod(moduleObject, method, nodeId, what, args, params);
@@ -313,7 +313,7 @@ jsi::Value ReanimatedJSI::get(
       auto env = Environment::current();
   
       auto nodeId = (jint)arguments[0].asNumber();
-      jintArray input = createJIntArray(env, runtime, std::move(arguments[1]));
+      auto input = createJIntArray(env, runtime, std::move(arguments[1]));
 
       auto method = env->GetMethodID(clazz, "createJSCallNode", "(I[I)V");
       env->CallVoidMethod(moduleObject, method, nodeId, input);
@@ -577,7 +577,7 @@ jsi::Value ReanimatedJSI::get(
       auto env = Environment::current();
   
       auto nodeId = (jint)arguments[0].asNumber();
-      jintArray block = createJIntArray(env, runtime, std::move(arguments[1]));
+      auto block = createJIntArray(env, runtime, std::move(arguments[1]));
 
       auto method = env->GetMethodID(clazz, "createBlockNode", "(I[I)V");
       env->CallVoidMethod(moduleObject, method, nodeId, block);
@@ -700,7 +700,7 @@ jsi::Value ReanimatedJSI::get(
     ) -> jsi::Value {
       auto env = Environment::current();
 
-      auto eventName = (jstring)env->NewStringUTF(arguments[1].asString(runtime).utf8(runtime).c_str());
+      local_ref<jstring> eventName = env->NewStringUTF(arguments[1].asString(runtime).utf8(runtime).c_str());
 
       env->CallVoidMethod(moduleObject, method, (jint)arguments[0].asNumber(), eventName, (jint)arguments[2].asNumber());
 
