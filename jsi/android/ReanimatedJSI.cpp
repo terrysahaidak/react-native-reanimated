@@ -17,8 +17,11 @@ void JNICALL Java_com_swmansion_reanimated_ReanimatedModule_installJSI(
   jlong runtimePtr
 ) {
   auto &runtime = *(facebook::jsi::Runtime *)runtimePtr;
+  
+  auto moduleObject = (jobject)env->NewGlobalRef(thiz);
 
   auto clazz = env->FindClass("com/swmansion/reanimated/ReanimatedModule");
+  auto classObject = (jclass)env->NewGlobalRef(clazz);
   auto createNode = env->GetMethodID(clazz, "createNodeJSI", "(Lcom/facebook/react/bridge/ReadableMap;)V");
   auto dropNode = env->GetMethodID(clazz, "dropNode", "(I)V");
   auto connectNodes = env->GetMethodID(clazz, "connectNodes", "(II)V");
@@ -30,8 +33,8 @@ void JNICALL Java_com_swmansion_reanimated_ReanimatedModule_installJSI(
   auto getValue = env->GetMethodID(clazz, "getValue", "(ILcom/swmansion/reanimated/Callback;)V");
 
   auto module = std::make_shared<ReanimatedJSI>(
-    clazz,
-    thiz,
+    classObject,
+    moduleObject,
     createNode,
     dropNode,
     connectNodes,
@@ -78,7 +81,7 @@ inline local_ref<ReadableArray::javaobject> castReadableArray(
   return make_local(reinterpret_cast<ReadableArray::javaobject>(nativeArray.get()));
 }
 
-local_ref<jintArray> createJIntArray(JNIEnv *env, jsi::Runtime &runtime, const jsi::Value &arg) {
+jintArray createJIntArray(JNIEnv *env, jsi::Runtime &runtime, const jsi::Value &arg) {
     auto arr = arg.getObject(runtime).asArray(runtime);
 
     auto arrayLength = arr.length(runtime);
@@ -158,7 +161,7 @@ jsi::Value ReanimatedJSI::get(
 
       jclass callbackClass = env->FindClass("com/swmansion/reanimated/Callback");
       jmethodID callbackConstructor = env->GetMethodID(callbackClass, "<init>", "(JJ)V");
-      local_ref<jobject> callback = env->NewObject(callbackClass, callbackConstructor, runtimePtr, fnPtr);
+      jobject callback = env->NewObject(callbackClass, callbackConstructor, runtimePtr, fnPtr);
 
       // this line throws "JNI DETECTED ERROR IN APPLICATION: use of invalid jobject 0x7ff25f9e14"
       env->CallVoidMethod(moduleObject, method, nodeId, callback);
@@ -209,10 +212,13 @@ jsi::Value ReanimatedJSI::get(
   
       auto nodeId = (jint)arguments[0].asNumber();
       auto op = (jstring)env->NewStringUTF(arguments[1].asString(runtime).utf8(runtime).c_str());
-      local_ref<jintArray> arr = createJIntArray(env, runtime, std::move(arguments[2]));
+      jintArray arr = createJIntArray(env, runtime, std::move(arguments[2]));
 
       auto method = env->GetMethodID(clazz, "createNodeOperator", "(ILjava/lang/String;[I)V");
       env->CallVoidMethod(moduleObject, method, nodeId, op, arr);
+
+      env->DeleteLocalRef(op);
+      env->DeleteLocalRef(arr);
 
       return jsi::Value::undefined();
     };
@@ -238,6 +244,8 @@ jsi::Value ReanimatedJSI::get(
 
       auto method = env->GetMethodID(clazz, "createDebugNode", "(ILjava/lang/String;I)V");
       env->CallVoidMethod(moduleObject, method, nodeId, message, value);
+
+      env->DeleteLocalRef(message);
 
       return jsi::Value::undefined();
     };
@@ -700,9 +708,11 @@ jsi::Value ReanimatedJSI::get(
     ) -> jsi::Value {
       auto env = Environment::current();
 
-      local_ref<jstring> eventName = env->NewStringUTF(arguments[1].asString(runtime).utf8(runtime).c_str());
+      auto eventName = env->NewStringUTF(arguments[1].asString(runtime).utf8(runtime).c_str());
 
       env->CallVoidMethod(moduleObject, method, (jint)arguments[0].asNumber(), eventName, (jint)arguments[2].asNumber());
+
+      env->DeleteLocalRef(eventName);
 
       return jsi::Value::undefined();
     };
@@ -725,6 +735,8 @@ jsi::Value ReanimatedJSI::get(
       auto eventName = (jstring)env->NewStringUTF(arguments[1].asString(runtime).utf8(runtime).c_str());
 
       env->CallVoidMethod(moduleObject, method, (jint)arguments[0].asNumber(), eventName, (jint)arguments[2].asNumber());
+
+      env->DeleteLocalRef(eventName);
 
       return jsi::Value::undefined();
     };
