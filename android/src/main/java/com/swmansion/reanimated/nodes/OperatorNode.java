@@ -221,11 +221,12 @@ public class OperatorNode extends Node {
   private final Node[] mInputNodes;
   private final Operator mOperator;
 
-  public OperatorNode(int nodeID, String op, int[] input, NodesManager nodesManager) {
-    super(nodeID, null, nodesManager);
-    mInputNodes = new Node[input.length];
-    mInputIDs = input;
+  public OperatorNode(int nodeID, ReadableMap config, NodesManager nodesManager) {
+    super(nodeID, config, nodesManager);
+    mInputIDs = Utils.processIntArray(config.getArray("input"));
+    mInputNodes = new Node[mInputIDs.length];
 
+    String op = config.getString("op");
     if ("add".equals(op)) {
       mOperator = ADD;
     } else if ("sub".equals(op)) {

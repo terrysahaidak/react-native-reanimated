@@ -2,23 +2,16 @@ package com.swmansion.reanimated.nodes;
 
 import com.facebook.react.bridge.ReadableMap;
 import com.swmansion.reanimated.NodesManager;
-import javax.annotation.Nullable;
 
 public class CondNode extends Node {
 
   private final int mCondID, mIfBlockID, mElseBlockID;
 
-  public CondNode(
-          int nodeID,
-          final int cond,
-          @Nullable final Integer ifBlock,
-          @Nullable final Integer elseBlock,
-          NodesManager nodesManager) {
-    super(nodeID, null, nodesManager);
-    mCondID = cond;
-
-    mIfBlockID = ifBlock != null ? ifBlock : -1;
-    mElseBlockID = elseBlock != null ? elseBlock : -1;
+  public CondNode(int nodeID, ReadableMap config, NodesManager nodesManager) {
+    super(nodeID, config, nodesManager);
+    mCondID = config.getInt("cond");
+    mIfBlockID = config.hasKey("ifBlock") ? config.getInt("ifBlock") : -1;
+    mElseBlockID = config.hasKey("elseBlock") ? config.getInt("elseBlock") : -1;
   }
 
   @Override
