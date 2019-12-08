@@ -1,8 +1,9 @@
 import { NativeModules } from 'react-native';
 
-const Module = global.NativeReanimated
-  ? global.NativeReanimated
-  : NativeModules.ReanimatedModule;
+const Module =
+  typeof global.NativeReanimated !== 'undefined'
+    ? global.NativeReanimated
+    : NativeModules.ReanimatedModule;
 
 // let count = 0;
 // const ReanimatedModule = new Proxy(Module, {
