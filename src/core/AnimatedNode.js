@@ -1,20 +1,6 @@
-import ActualReanimated from '../ReanimatedModule';
+import ReanimatedModule from '../ReanimatedModule';
 
 let shouldLog = true;
-const ReanimatedModule = new Proxy(ActualReanimated, {
-  get(target, method) {
-    const origMethod = target[method];
-
-    return function(...args) {
-      try {
-        origMethod.apply(this, args);
-        console.log(method, args);
-      } catch (err) {
-        console.error(`Error calling ${method} with args ${args}`);
-      }
-    };
-  },
-});
 
 const UPDATED_NODES = [];
 

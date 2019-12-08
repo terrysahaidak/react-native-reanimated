@@ -166,7 +166,7 @@
 
 // export default Interpolate;
 import React from 'react';
-import { View } from 'react-native';
+import { View, Button } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
 
 const {
@@ -174,6 +174,7 @@ const {
   Value,
   set,
   cond,
+  Code,
   startClock,
   clockRunning,
   timing,
@@ -222,24 +223,38 @@ function runTiming(clock, value, dest) {
   ]);
 }
 
-export default class AnimatedBox extends React.Component {
+class AnimatedBox extends React.Component {
   // we create a clock node
   clock = new Clock();
-  value = new Value();
   // and use runTiming method defined above to create a node that is going to be mapped
   // to the translateX transform.
-  // transX = runTiming(this.clock, -120, 120);
+  transX = runTiming(this.clock, 0, 25);
 
   render() {
     return (
-      <View style={{ flex: 1 }}>
-        <Animated.View
-          style={[
-            { height: 30, width: 30 },
-            { transform: [{ translateX: this.value }] },
-          ]}
-        />
-      </View>
+      <Animated.View
+        style={[
+          {
+            height: 50,
+            width: 50,
+            borderRadius: this.transX,
+            backgroundColor: 'black',
+          },
+        ]}
+      />
     );
   }
+}
+
+export default function List() {
+  const [show, setShow] = React.useState(false);
+
+  const list = Array.from({ length: 10 }, (_, i) => i);
+
+  return (
+    <View>
+      <Button title="Show" onPress={() => setShow(v => !v)} />
+      {show && list.map(i => <AnimatedBox key={i} />)}
+    </View>
+  );
 }
