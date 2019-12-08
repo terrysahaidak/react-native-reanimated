@@ -18,35 +18,21 @@ extern "C" {
 
 class ReanimatedJSI : public jsi::HostObject {
 private:
-  jclass _moduleClass;
+  // jclass _moduleClass;
   jobject _moduleObject;
-  jmethodID _createNode;
-  jmethodID _dropNode;
   jmethodID _connectNodes;
-  jmethodID _disconnectNodes;
-  jmethodID _connectNodeToView;
-  jmethodID _disconnectNodeFromView;
-  jmethodID _attachEvent;
-  jmethodID _detachEvent;
-  jmethodID _getValue;
+  // jmethodID _disconnectNodes;
 
 public:
   ReanimatedJSI(
-    jclass moduleClass,
+    // jclass moduleClass,
     jobject moduleObject,
-    jmethodID createNode,
-    jmethodID dropNode,
-    jmethodID connectNodes,
-    jmethodID disconnectNodes,
-    jmethodID connectNodeToView,
-    jmethodID disconnectNodeFromView,
-    jmethodID attachEvent,
-    jmethodID detachEvent,
-    jmethodID getValue
+    jmethodID connectNodes
+    // jmethodID disconnectNodes,
   );
 
   static void install(
-  jsi::Runtime &runtime,
+    jsi::Runtime &runtime,
     const std::shared_ptr<ReanimatedJSI> module
   );
 

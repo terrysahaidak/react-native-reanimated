@@ -149,8 +149,9 @@ export default class AnimatedNode {
     }
     this.__children.push(child);
     child.__nativeInitialize();
-
-    if (ReanimatedModule.connectNodes) {
+    if (global.NativeReanimated) {
+      global.NativeReanimated.connectNodes(this.__nodeID, child.__nodeID);
+    } else if (ReanimatedModule.connectNodes) {
       ReanimatedModule.connectNodes(this.__nodeID, child.__nodeID);
     } else {
       this.__dangerouslyRescheduleEvaluate();
