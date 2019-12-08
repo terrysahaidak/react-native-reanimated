@@ -548,6 +548,31 @@ jsi::Value ReanimatedJSI::get(
     return jsi::Function::createFromHostFunction(runtime, name, 3, callback);
   }
 
+  if (methodName == "createCondNodeOptional") {
+    auto &moduleObject = _moduleObject;
+    auto &clazz = _moduleClass;
+
+    auto callback = [clazz, moduleObject](
+      jsi::Runtime &runtime,
+      const jsi::Value &thisValue,
+      const jsi::Value *arguments,
+      size_t count
+    ) -> jsi::Value {
+      auto env = Environment::current();
+  
+      auto nodeId = (jint)arguments[0].asNumber();
+      auto cond = (jint)arguments[1].asNumber();
+      auto ifBlock = (jint)arguments[2].asNumber();
+
+      auto method = env->GetMethodID(clazz, "createCondNodeOptional", "(III)V");
+      env->CallVoidMethod(moduleObject, method, nodeId, cond, ifBlock);
+
+      return jsi::Value::undefined();
+    };
+
+    return jsi::Function::createFromHostFunction(runtime, name, 3, callback);
+  }
+
   if (methodName == "createSetNode") {
     auto &moduleObject = _moduleObject;
     auto &clazz = _moduleClass;

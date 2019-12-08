@@ -189,6 +189,15 @@ public class ReanimatedModule extends ReactContextBaseJavaModule implements
     });
   }
 
+  public void createCondNodeOptional(final int nodeId, final int cond, final int ifBlock) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createCondNodeOptional(nodeId, cond, ifBlock);
+      }
+    });
+  }
+
   public void createSetNode(final int nodeId, final int what, final int value) {
     mOperations.add(new UIThreadOperation() {
       @Override

@@ -276,6 +276,10 @@ public class NodesManager implements EventDispatcherListener {
     mAnimatedNodes.put(nodeId, new CondNode(nodeId, cond, ifBlock, elseBlock, this));
   }
 
+  public void createCondNodeOptional(final int nodeId, final int cond, final int ifBlock) {
+    mAnimatedNodes.put(nodeId, new CondNode(nodeId, cond, ifBlock, null, this));
+  }
+
   public void createSetNode(final int nodeId, final int what, final int value) {
     mAnimatedNodes.put(nodeId, new SetNode(nodeId, what, value, this));
   }
