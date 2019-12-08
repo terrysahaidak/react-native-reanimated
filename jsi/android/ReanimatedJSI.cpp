@@ -22,7 +22,7 @@ void JNICALL Java_com_swmansion_reanimated_ReanimatedModule_installJSI(
 
   auto clazz = env->FindClass("com/swmansion/reanimated/ReanimatedModule");
   auto classObject = (jclass)env->NewGlobalRef(clazz);
-  auto createNode = env->GetMethodID(clazz, "createNodeJSI", "(Lcom/facebook/react/bridge/ReadableMap;)V");
+  auto createNode = env->GetMethodID(clazz, "createNode", "(ILcom/facebook/react/bridge/ReadableMap;)V");
   auto dropNode = env->GetMethodID(clazz, "dropNode", "(I)V");
   auto connectNodes = env->GetMethodID(clazz, "connectNodes", "(II)V");
   auto disconnectNodes = env->GetMethodID(clazz, "disconnectNodes", "(II)V");
@@ -535,11 +535,12 @@ jsi::Value ReanimatedJSI::get(
       auto env = Environment::current();
   
       auto nodeId = (jint)arguments[0].asNumber();
-      auto ifBlock = (jint)arguments[1].asNumber();
-      auto elseBlock = (jint)arguments[2].asNumber();
+      auto cond = (jint)arguments[1].asNumber();
+      auto ifBlock = (jint)arguments[2].asNumber();
+      auto elseBlock = (jint)arguments[3].asNumber();
 
-      auto method = env->GetMethodID(clazz, "createCondNode", "(III)V");
-      env->CallVoidMethod(moduleObject, method, nodeId, ifBlock, elseBlock);
+      auto method = env->GetMethodID(clazz, "createCondNode", "(IIII)V");
+      env->CallVoidMethod(moduleObject, method, nodeId, cond, ifBlock, elseBlock);
 
       return jsi::Value::undefined();
     };
