@@ -40,8 +40,8 @@ export default class InternalAnimatedValue extends AnimatedNode {
 
   __detach() {
     if (!this._constant) {
-      if (ReanimatedModule.getValue) {
-        ReanimatedModule.getValue(
+      if (global.NativeReanimated.getValue) {
+        global.NativeReanimated.getValue(
           this.__nodeID,
           val => (this.__nodeConfig.value = val)
         );

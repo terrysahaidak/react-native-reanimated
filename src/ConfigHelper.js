@@ -104,7 +104,7 @@ let NATIVE_THREAD_PROPS_WHITELIST = {
 };
 
 function configureProps() {
-  ReanimatedModule.configureProps(
+  global.NativeReanimated.configureProps(
     Object.keys(NATIVE_THREAD_PROPS_WHITELIST),
     Object.keys(UI_THREAD_PROPS_WHITELIST)
   );

@@ -166,7 +166,7 @@
 
 // export default Interpolate;
 import React from 'react';
-import { View, Button } from 'react-native';
+import { ScrollView, Button, View } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
 
 const {
@@ -235,8 +235,8 @@ class AnimatedBox extends React.Component {
       <Animated.View
         style={[
           {
-            height: 50,
-            width: 50,
+            height: 20,
+            width: 20,
             borderRadius: this.transX,
             backgroundColor: 'black',
           },
@@ -249,12 +249,14 @@ class AnimatedBox extends React.Component {
 export default function List() {
   const [show, setShow] = React.useState(false);
 
-  const list = Array.from({ length: 10 }, (_, i) => i);
+  const list = Array.from({ length: 200 }, (_, i) => i);
 
   return (
-    <View>
+    <ScrollView>
       <Button title="Show" onPress={() => setShow(v => !v)} />
-      {show && list.map(i => <AnimatedBox key={i} />)}
-    </View>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+        {show && list.map(i => <AnimatedBox key={i} />)}
+      </View>
+    </ScrollView>
   );
 }
