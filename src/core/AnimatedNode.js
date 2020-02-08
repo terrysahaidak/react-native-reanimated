@@ -1,5 +1,7 @@
 import ReanimatedModule from '../ReanimatedModule';
 
+let shouldLog = true;
+
 const UPDATED_NODES = [];
 
 let loopID = 1;
@@ -115,14 +117,112 @@ export default class AnimatedNode {
 
   __nativeInitialize() {
     if (!this.__initialized) {
-      ReanimatedModule.createNode(this.__nodeID, { ...this.__nodeConfig });
+      if (this.__nodeConfig.type === 'op') {
+        global.NativeReanimated.createNodeOperator(
+          this.__nodeID,
+          this.__nodeConfig.op,
+          this.__nodeConfig.input
+        );
+      } else if (this.__nodeConfig.type === 'block') {
+        global.NativeReanimated.createBlockNode(
+          this.__nodeID,
+          this.__nodeConfig.block
+        );
+      } else if (this.__nodeConfig.type === 'cond') {
+        if (typeof this.__nodeConfig.elseBlock !== 'undefined') {
+          global.NativeReanimated.createCondNode(
+            this.__nodeID,
+            this.__nodeConfig.cond,
+            this.__nodeConfig.ifBlock,
+            this.__nodeConfig.elseBlock
+          );
+        } else {
+          global.NativeReanimated.createCondNodeOptional(
+            this.__nodeID,
+            this.__nodeConfig.cond,
+            this.__nodeConfig.ifBlock
+          );
+        }
+      } else if (this.__nodeConfig.type === 'set') {
+        global.NativeReanimated.createSetNode(
+          this.__nodeID,
+          this.__nodeConfig.what,
+          this.__nodeConfig.value
+        );
+      } else if (this.__nodeConfig.type === 'debug') {
+        global.NativeReanimated.createDebugNode(
+          this.__nodeID,
+          this.__nodeConfig.message,
+          this.__nodeConfig.value
+        );
+      } else if (this.__nodeConfig.type === 'clock') {
+        global.NativeReanimated.createClockNode(this.__nodeID);
+      } else if (this.__nodeConfig.type === 'clockStart') {
+        global.NativeReanimated.createClockStartNode(
+          this.__nodeID,
+          this.__nodeConfig.clock
+        );
+      } else if (this.__nodeConfig.type === 'clockStop') {
+        global.NativeReanimated.createClockStopNode(
+          this.__nodeID,
+          this.__nodeConfig.clock
+        );
+      } else if (this.__nodeConfig.type === 'clockTest') {
+        global.NativeReanimated.createClockTestNode(
+          this.__nodeID,
+          this.__nodeConfig.clock
+        );
+      } else if (this.__nodeConfig.type === 'call') {
+        global.NativeReanimated.createJSCallNode(
+          this.__nodeID,
+          this.__nodeConfig.input
+        );
+      } else if (this.__nodeConfig.type === 'bezier') {
+        global.NativeReanimated.createBezierNode(
+          this.__nodeID,
+          this.__nodeConfig.input,
+          this.__nodeConfig.mX1,
+          this.__nodeConfig.mY1,
+          this.__nodeConfig.mX2,
+          this.__nodeConfig.mY2
+        );
+      } else if (this.__nodeConfig.type === 'callfunc') {
+        global.NativeReanimated.createNodeCallFunc(
+          this.__nodeID,
+          this.__nodeConfig.what,
+          this.__nodeConfig.args,
+          this.__nodeConfig.params
+        );
+      } else if (this.__nodeConfig.type === 'func') {
+        global.NativeReanimated.createNodeFunction(
+          this.__nodeID,
+          this.__nodeConfig.what
+        );
+      } else if (this.__nodeConfig.type === 'param') {
+        global.NativeReanimated.createNodeParam(this.__nodeID);
+      } else if (this.__nodeConfig.type === 'concat') {
+        global.NativeReanimated.createNodeConcat(
+          this.__nodeID,
+          this.__nodeConfig.input
+        );
+      } else if (this.__nodeConfig.type === 'always') {
+        global.NativeReanimated.createNodeConcat(
+          this.__nodeID,
+          this.__nodeConfig.what
+        );
+      } else {
+        global.NativeReanimated.createNode(this.__nodeID, {
+          ...this.__nodeConfig,
+        });
+      }
+
       this.__initialized = true;
     }
   }
 
   __nativeTearDown() {
     if (this.__initialized) {
-      ReanimatedModule.dropNode(this.__nodeID);
+      global.NativeReanimated.dropNode(this.__nodeID);
       this.__initialized = false;
     }
   }
@@ -150,8 +250,8 @@ export default class AnimatedNode {
     this.__children.push(child);
     child.__nativeInitialize();
 
-    if (ReanimatedModule.connectNodes) {
-      ReanimatedModule.connectNodes(this.__nodeID, child.__nodeID);
+    if (global.NativeReanimated.connectNodes) {
+      global.NativeReanimated.connectNodes(this.__nodeID, child.__nodeID);
     } else {
       this.__dangerouslyRescheduleEvaluate();
     }
@@ -163,7 +263,7 @@ export default class AnimatedNode {
       console.warn("Trying to remove a child that doesn't exist");
       return;
     }
-    ReanimatedModule.disconnectNodes(this.__nodeID, child.__nodeID);
+    global.NativeReanimated.disconnectNodes(this.__nodeID, child.__nodeID);
 
     this.__children.splice(index, 1);
     if (this.__children.length === 0) {
@@ -172,14 +272,17 @@ export default class AnimatedNode {
   }
 
   _connectAnimatedView(nativeViewTag) {
-    if (ReanimatedModule.connectNodeToView) {
-      ReanimatedModule.connectNodeToView(this.__nodeID, nativeViewTag);
+    if (global.NativeReanimated.connectNodeToView) {
+      global.NativeReanimated.connectNodeToView(this.__nodeID, nativeViewTag);
     } else {
       this.__dangerouslyRescheduleEvaluate();
     }
   }
 
   _disconnectAnimatedView(nativeViewTag) {
-    ReanimatedModule.disconnectNodeFromView(this.__nodeID, nativeViewTag);
+    global.NativeReanimated.disconnectNodeFromView(
+      this.__nodeID,
+      nativeViewTag
+    );
   }
 }

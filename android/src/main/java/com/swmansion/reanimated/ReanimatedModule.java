@@ -1,6 +1,5 @@
 package com.swmansion.reanimated;
 
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -25,6 +24,8 @@ public class ReanimatedModule extends ReactContextBaseJavaModule implements
         LifecycleEventListener, UIManagerModuleListener {
 
   public static final String NAME = "ReanimatedModule";
+
+  public native void installJSI(long javaScriptContextHolder);
 
   private interface UIThreadOperation {
     void execute(NodesManager nodesManager);
@@ -109,6 +110,168 @@ public class ReanimatedModule extends ReactContextBaseJavaModule implements
       @Override
       public void execute(NodesManager nodesManager) {
         nodesManager.createNode(tag, config);
+      }
+    });
+  }
+
+  @ReactMethod
+  public void createNodeJSI(final ReadableMap config) {
+    
+  }
+
+  public void createNodeOperator(final int nodeId, final String op, final int[] input) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createNodeOperator(nodeId, op, input);
+      }
+    });
+  }
+  public void createNodeCallFunc(final int nodeId, final int what, final int[] args, final int[] params) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createNodeCallFunc(nodeId, what, args, params);
+      }
+    });
+  }
+  public void createNodeFunction(final int nodeId, final int what) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createNodeFunction(nodeId, what);
+      }
+    });
+  }
+
+  public void createNodeParam(final int nodeId) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createNodeParam(nodeId);
+      }
+    });
+  }
+
+  public void createNodeConcat(final int nodeId, final int[] input) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createNodeConcat(nodeId, input);
+      }
+    });
+  }
+
+  public void createNodeAlways(final int nodeId, final int what) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createNodeAlways(nodeId, what);
+      }
+    });
+  }
+
+  public void createBlockNode(final int nodeId, final int[] block) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createBlockNode(nodeId, block);
+      }
+    });
+  }
+
+  public void createCondNode(final int nodeId, final int cond, final int ifBlock, final int elseBlock) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createCondNode(nodeId, cond, ifBlock, elseBlock);
+      }
+    });
+  }
+
+  public void createCondNodeOptional(final int nodeId, final int cond, final int ifBlock) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createCondNodeOptional(nodeId, cond, ifBlock);
+      }
+    });
+  }
+
+  public void createSetNode(final int nodeId, final int what, final int value) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createSetNode(nodeId, what, value);
+      }
+    });
+  }
+
+  public void createDebugNode(final int nodeId, final String message, final int value) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createDebugNode(nodeId, message, value);
+      }
+    });
+  }
+
+  public void createClockNode(final int nodeId) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createClockNode(nodeId);
+      }
+    });
+  }
+
+  public void createClockStartNode(final int nodeId, final int clock) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createClockStartNode(nodeId, clock);
+      }
+    });
+  }
+
+  public void createClockStopNode(final int nodeId, final int clock) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createClockStopNode(nodeId, clock);
+      }
+    });
+  }
+
+  public void createClockTestNode(final int nodeId, final int clock) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createClockTestNode(nodeId, clock);
+      }
+    });
+  }
+
+  public void createJSCallNode(final int nodeId, final int[] input) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createJSCallNode(nodeId, input);
+      }
+    });
+  }
+
+  public void createBezierNode(
+          final int nodeId,
+          final int input,
+          final double mX1,
+          final double mY1,
+          final double mX2,
+          final double mY2) {
+    mOperations.add(new UIThreadOperation() {
+      @Override
+      public void execute(NodesManager nodesManager) {
+        nodesManager.createBezierNode(nodeId, input, mX1, mY1, mX2, mY2);
       }
     });
   }

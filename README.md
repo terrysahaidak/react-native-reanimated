@@ -1,5 +1,13 @@
 # react-native-reanimated
 
+
+## NOTE ABOUT JSI
+
+Edit files in `jsi/android` and run `npm run android` inside the Example. It will copy/paste those files into RN source code and build it together.
+
+
+-----------
+
 React Native's Animated library reimplemented.
 
 It provides a more comprehensive, low level abstraction for the Animated library API to be built on top of and hence allow for much greater flexibility especially when it comes to gesture based interactions.

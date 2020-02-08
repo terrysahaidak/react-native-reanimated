@@ -103,7 +103,7 @@ export default class AnimatedEvent extends AnimatedNode {
     }
     this.__attach();
     const viewTag = findNodeHandle(viewRef);
-    ReanimatedModule.attachEvent(viewTag, eventName, this.__nodeID);
+    global.NativeReanimated.attachEvent(viewTag, eventName, this.__nodeID);
   }
 
   __onEvaluate() {
@@ -116,7 +116,7 @@ export default class AnimatedEvent extends AnimatedNode {
         this._alwaysNodes[i].__detach();
     }
     const viewTag = findNodeHandle(viewRef);
-    ReanimatedModule.detachEvent(viewTag, eventName, this.__nodeID);
+    global.NativeReanimated.detachEvent(viewTag, eventName, this.__nodeID);
     this.__detach();
   }
 }
